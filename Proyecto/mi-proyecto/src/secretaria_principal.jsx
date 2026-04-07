@@ -158,7 +158,17 @@ function SecretariaPrincipal() {
   }
 
   /* ── Helpers ── */
+
+  // Formato unificado: "20/03/2026, 22:29:09"
+  const formatDateTime = (d) => d.toLocaleString('es-CO', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+  })
+
+  // Solo fecha para el header (si la necesitas separada en algún lugar)
   const formatDate = (d) => d.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' })
+
+  // Solo hora para el header
   const formatTime = (d) => d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
 
   const calcularEdad = (fechaNacimiento) => {
@@ -388,8 +398,8 @@ function SecretariaPrincipal() {
             <FiLogOut /> Cerrar sesión
           </button>
           <div className="datetime-box">
-            <span className="current-date">{formatDate(currentTime)}</span>
-            <span className="current-time">{formatTime(currentTime)}</span>
+            {/* Fecha y hora unificadas con coma: "20/03/2026, 22:29:09" */}
+            <span className="current-date">{formatDateTime(currentTime)}</span>
           </div>
           <div className="user-profile">
             <div className="user-avatar">AD</div>
@@ -439,28 +449,40 @@ function SecretariaPrincipal() {
           {/* SECCIONES */}
           <div className="patient-sections">
 
-            {/* FORMULARIO */}
+            {/* FORMULARIO — sin noValidate para activar tooltips nativos del browser */}
             <div className="form-section">
               <h3><FiUser className="section-icon" /> Nuevo Paciente</h3>
-              <form onSubmit={handleSubmit} className="patient-form" noValidate>
+              <form onSubmit={handleSubmit} className="patient-form">
 
                 <div className="form-section-label">IDENTIFICACIÓN</div>
 
                 <div className="form-group">
                   <label>NÚMERO DE IDENTIFICACIÓN *</label>
                   <CampoRequerido error={errores.id}>
-                    <input type="text" name="id" placeholder="Ej. 1062554433"
-                      value={nuevoPaciente.id} onChange={handleInputChange}
-                      style={inputStyle('id')} />
+                    <input
+                      type="text"
+                      name="id"
+                      placeholder="Ej. 1062554433"
+                      value={nuevoPaciente.id}
+                      onChange={handleInputChange}
+                      style={inputStyle('id')}
+                      required
+                    />
                   </CampoRequerido>
                 </div>
 
                 <div className="form-group">
                   <label>NOMBRE COMPLETO *</label>
                   <CampoRequerido error={errores.nombre}>
-                    <input type="text" name="nombre" placeholder="Ej. Laura Grijalba Mena"
-                      value={nuevoPaciente.nombre} onChange={handleInputChange}
-                      style={inputStyle('nombre')} />
+                    <input
+                      type="text"
+                      name="nombre"
+                      placeholder="Ej. Laura Grijalba Mena"
+                      value={nuevoPaciente.nombre}
+                      onChange={handleInputChange}
+                      style={inputStyle('nombre')}
+                      required
+                    />
                   </CampoRequerido>
                 </div>
 
@@ -468,16 +490,27 @@ function SecretariaPrincipal() {
                   <div className="form-group">
                     <label>FECHA DE NACIMIENTO *</label>
                     <CampoRequerido error={errores.fechaNacimiento}>
-                      <input type="date" name="fechaNacimiento" max={hoy}
-                        value={nuevoPaciente.fechaNacimiento} onChange={handleInputChange}
-                        style={inputStyle('fechaNacimiento')} />
+                      <input
+                        type="date"
+                        name="fechaNacimiento"
+                        max={hoy}
+                        value={nuevoPaciente.fechaNacimiento}
+                        onChange={handleInputChange}
+                        style={inputStyle('fechaNacimiento')}
+                        required
+                      />
                     </CampoRequerido>
                   </div>
                   <div className="form-group">
                     <label>GÉNERO *</label>
                     <CampoRequerido error={errores.genero}>
-                      <select name="genero" value={nuevoPaciente.genero} onChange={handleInputChange}
-                        style={inputStyle('genero')}>
+                      <select
+                        name="genero"
+                        value={nuevoPaciente.genero}
+                        onChange={handleInputChange}
+                        style={inputStyle('genero')}
+                        required
+                      >
                         <option value="">Seleccione</option>
                         <option value="M">Masculino</option>
                         <option value="F">Femenino</option>
@@ -490,8 +523,13 @@ function SecretariaPrincipal() {
                 <div className="form-group">
                   <label>TIPO DE SANGRE *</label>
                   <CampoRequerido error={errores.tipoSangre}>
-                    <select name="tipoSangre" value={nuevoPaciente.tipoSangre} onChange={handleInputChange}
-                      style={inputStyle('tipoSangre')}>
+                    <select
+                      name="tipoSangre"
+                      value={nuevoPaciente.tipoSangre}
+                      onChange={handleInputChange}
+                      style={inputStyle('tipoSangre')}
+                      required
+                    >
                       <option value="">Seleccione</option>
                       {['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(t => (
                         <option key={t} value={t}>{t}</option>
@@ -505,50 +543,87 @@ function SecretariaPrincipal() {
                 <div className="form-group">
                   <label>TELÉFONO *</label>
                   <CampoRequerido error={errores.telefono}>
-                    <input type="tel" name="telefono" placeholder="Ej. 3214556879"
-                      value={nuevoPaciente.telefono} onChange={handleInputChange}
-                      style={inputStyle('telefono')} maxLength={10} />
+                    <input
+                      type="tel"
+                      name="telefono"
+                      placeholder="Ej. 3214556879"
+                      value={nuevoPaciente.telefono}
+                      onChange={handleInputChange}
+                      style={inputStyle('telefono')}
+                      maxLength={10}
+                      required
+                    />
                   </CampoRequerido>
                 </div>
 
+                {/* EMAIL — opcional, sin required */}
                 <div className="form-group">
                   <label>EMAIL</label>
-                  <input type="email" name="email" placeholder="Ej. correo@email.com"
-                    value={nuevoPaciente.email} onChange={handleInputChange} />
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Ej. correo@email.com"
+                    value={nuevoPaciente.email}
+                    onChange={handleInputChange}
+                  />
                 </div>
 
                 <div className="form-group">
                   <label>DIRECCIÓN *</label>
                   <CampoRequerido error={errores.direccion}>
-                    <input type="text" name="direccion" placeholder="Ej. Calle 12 # 3-45"
-                      value={nuevoPaciente.direccion} onChange={handleInputChange}
-                      style={inputStyle('direccion')} />
+                    <input
+                      type="text"
+                      name="direccion"
+                      placeholder="Ej. Calle 12 # 3-45"
+                      value={nuevoPaciente.direccion}
+                      onChange={handleInputChange}
+                      style={inputStyle('direccion')}
+                      required
+                    />
                   </CampoRequerido>
                 </div>
 
                 <div className="form-group">
                   <label>CIUDAD *</label>
                   <CampoRequerido error={errores.ciudad}>
-                    <input type="text" name="ciudad" placeholder="Ej. Popayán"
-                      value={nuevoPaciente.ciudad} onChange={handleInputChange}
-                      style={inputStyle('ciudad')} />
+                    <input
+                      type="text"
+                      name="ciudad"
+                      placeholder="Ej. Popayán"
+                      value={nuevoPaciente.ciudad}
+                      onChange={handleInputChange}
+                      style={inputStyle('ciudad')}
+                      required
+                    />
                   </CampoRequerido>
                 </div>
 
+                {/* CONTACTO DE EMERGENCIA — sin tocar, sin required */}
                 <div className="form-section-label">CONTACTO DE EMERGENCIA</div>
 
                 <div className="form-group">
                   <label>NOMBRE COMPLETO</label>
-                  <input type="text" name="contactoEmergenciaNombre" placeholder="Ej. Pedro Grijalba"
-                    value={nuevoPaciente.contactoEmergenciaNombre} onChange={handleInputChange} />
+                  <input
+                    type="text"
+                    name="contactoEmergenciaNombre"
+                    placeholder="Ej. Pedro Grijalba"
+                    value={nuevoPaciente.contactoEmergenciaNombre}
+                    onChange={handleInputChange}
+                  />
                 </div>
 
                 <div className="form-group">
                   <label>TELÉFONO</label>
                   <CampoRequerido error={errores.contactoEmergenciaTel}>
-                    <input type="tel" name="contactoEmergenciaTel" placeholder="Ej. 3119900112"
-                      value={nuevoPaciente.contactoEmergenciaTel} onChange={handleInputChange}
-                      style={inputStyle('contactoEmergenciaTel')} maxLength={10} />
+                    <input
+                      type="tel"
+                      name="contactoEmergenciaTel"
+                      placeholder="Ej. 3119900112"
+                      value={nuevoPaciente.contactoEmergenciaTel}
+                      onChange={handleInputChange}
+                      style={inputStyle('contactoEmergenciaTel')}
+                      maxLength={10}
+                    />
                   </CampoRequerido>
                 </div>
 
@@ -601,7 +676,8 @@ function SecretariaPrincipal() {
         <span>CMQ - Módulo Clínica</span>
         <span className="session-info">
           <span className="status-dot" />
-          Sesión activa — {formatTime(currentTime)}
+          {/* Formato unificado con coma en el footer también */}
+          Sesión activa — {formatDateTime(currentTime)}
         </span>
       </footer>
 
@@ -663,60 +739,95 @@ function SecretariaPrincipal() {
                 <input type="text" value={pacienteEditando.id} disabled />
               </div>
 
+              {/* NOMBRE — requerido en edición */}
               <div className="form-group">
                 <label>NOMBRE COMPLETO *</label>
                 <CampoRequerido error={erroresEdit.nombre}>
-                  <input type="text" name="nombre" value={pacienteEditando.nombre}
+                  <input
+                    type="text"
+                    name="nombre"
+                    value={pacienteEditando.nombre}
                     onChange={(e) => handleCambioEdit('nombre', e.target.value)}
-                    style={inputStyleEdit('nombre')} />
+                    style={inputStyleEdit('nombre')}
+                    required
+                  />
                 </CampoRequerido>
               </div>
 
+              {/* TELÉFONO — requerido en edición */}
               <div className="form-group">
                 <label>TELÉFONO *</label>
                 <CampoRequerido error={erroresEdit.telefono}>
-                  <input type="tel" name="telefono" value={pacienteEditando.telefono} maxLength={10}
+                  <input
+                    type="tel"
+                    name="telefono"
+                    value={pacienteEditando.telefono}
+                    maxLength={10}
                     onChange={(e) => handleCambioEdit('telefono', e.target.value)}
-                    style={inputStyleEdit('telefono')} />
+                    style={inputStyleEdit('telefono')}
+                    required
+                  />
                 </CampoRequerido>
               </div>
 
+              {/* EMAIL — opcional en edición, sin required */}
               <div className="form-group">
                 <label>EMAIL</label>
-                <input type="email" value={pacienteEditando.email}
-                  onChange={(e) => handleCambioEdit('email', e.target.value)} />
+                <input
+                  type="email"
+                  value={pacienteEditando.email}
+                  onChange={(e) => handleCambioEdit('email', e.target.value)}
+                />
               </div>
 
+              {/* DIRECCIÓN — requerido en edición */}
               <div className="form-group">
                 <label>DIRECCIÓN *</label>
                 <CampoRequerido error={erroresEdit.direccion}>
-                  <input type="text" value={pacienteEditando.direccion}
+                  <input
+                    type="text"
+                    value={pacienteEditando.direccion}
                     onChange={(e) => handleCambioEdit('direccion', e.target.value)}
-                    style={inputStyleEdit('direccion')} />
+                    style={inputStyleEdit('direccion')}
+                    required
+                  />
                 </CampoRequerido>
               </div>
 
+              {/* CIUDAD — requerido en edición */}
               <div className="form-group">
                 <label>CIUDAD *</label>
                 <CampoRequerido error={erroresEdit.ciudad}>
-                  <input type="text" value={pacienteEditando.ciudad}
+                  <input
+                    type="text"
+                    value={pacienteEditando.ciudad}
                     onChange={(e) => handleCambioEdit('ciudad', e.target.value)}
-                    style={inputStyleEdit('ciudad')} />
+                    style={inputStyleEdit('ciudad')}
+                    required
+                  />
                 </CampoRequerido>
               </div>
 
+              {/* CONTACTO DE EMERGENCIA — sin tocar, sin required */}
               <div className="form-group">
                 <label>CONTACTO EMERGENCIA — NOMBRE</label>
-                <input type="text" value={pacienteEditando.contactoEmergenciaNombre}
-                  onChange={(e) => handleCambioEdit('contactoEmergenciaNombre', e.target.value)} />
+                <input
+                  type="text"
+                  value={pacienteEditando.contactoEmergenciaNombre}
+                  onChange={(e) => handleCambioEdit('contactoEmergenciaNombre', e.target.value)}
+                />
               </div>
 
               <div className="form-group">
                 <label>CONTACTO EMERGENCIA — TELÉFONO</label>
                 <CampoRequerido error={erroresEdit.contactoEmergenciaTel}>
-                  <input type="tel" value={pacienteEditando.contactoEmergenciaTel} maxLength={10}
+                  <input
+                    type="tel"
+                    value={pacienteEditando.contactoEmergenciaTel}
+                    maxLength={10}
                     onChange={(e) => handleCambioEdit('contactoEmergenciaTel', e.target.value)}
-                    style={inputStyleEdit('contactoEmergenciaTel')} />
+                    style={inputStyleEdit('contactoEmergenciaTel')}
+                  />
                 </CampoRequerido>
               </div>
 
